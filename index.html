@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StreamRadar SE - Cross-Check Sweden Streaming</title>
+  
+  <!-- Tizen TV webapis (loaded natively on Samsung Smart TVs) -->
+  <script type="text/javascript" src="$WEBAPIS/webapis/webapis.js"></script>
+  
+  <link rel="stylesheet" href="./src/styles.css">
+</head>
+<body>
+
+  <!-- App Header -->
+  <header class="app-header">
+    <div class="header-top">
+      <div class="logo-area">
+        <span class="logo-badge">SE</span>
+        <h1 class="logo-title">StreamRadar</h1>
+        <span class="logo-sub">Sweden Cross-Checker</span>
+      </div>
+
+      <!-- Remote Control Hints -->
+      <div class="remote-hints">
+        <span class="key-pill"><span class="dot dot-red"></span> Red: Netflix</span>
+        <span class="key-pill"><span class="dot dot-green"></span> Green: Disney+</span>
+        <span class="key-pill"><span class="dot dot-yellow"></span> Yellow: Max</span>
+        <span class="key-pill"><span class="dot dot-blue"></span> Blue: Prime</span>
+        <span class="key-pill">⌕ D-Pad: Navigate</span>
+        <span class="key-pill">OK: Details</span>
+      </div>
+    </div>
+
+    <!-- Navigation Bar & Search -->
+    <div class="nav-row">
+      <div class="tabs-group" role="tablist">
+        <button class="nav-tab focusable active" data-tab="trending" role="tab" aria-selected="true" tabindex="0">
+          🔥 Trending Across My Services
+        </button>
+        <button class="nav-tab focusable" data-tab="upcoming" role="tab" aria-selected="false" tabindex="0">
+          📅 Coming Soon & New (2026)
+        </button>
+        <button class="nav-tab focusable" data-tab="search" role="tab" aria-selected="false" tabindex="0">
+          🔍 Search Catalogs
+        </button>
+      </div>
+
+      <div class="search-box-wrap">
+        <input 
+          id="searchInput" 
+          type="search" 
+          class="search-input focusable" 
+          placeholder="Search any movie or show (e.g. Dune, Succession)..." 
+          aria-label="Search movies and series"
+          tabindex="0"
+        />
+      </div>
+    </div>
+  </header>
+
+  <!-- Provider Filter Pills -->
+  <div class="filter-bar" id="filterBar" role="region" aria-label="Streaming Provider Filters">
+    <!-- Populated dynamically by app.js -->
+  </div>
+
+  <!-- Main Content Grid -->
+  <main class="main-container">
+    <div class="section-header">
+      <h2 class="section-title" id="sectionTitle">Trending Across Your Services (Sweden)</h2>
+      <span class="section-count" id="sectionCount">Loading...</span>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div class="loading-box" id="loadingBox">
+      <div class="spinner"></div>
+      <p>Cross-checking Sweden streaming catalogs...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-box hidden" id="emptyBox">
+      <h3>No titles found</h3>
+      <p>Try searching for another movie or toggling your streaming filters above.</p>
+    </div>
+
+    <!-- Poster Grid -->
+    <div class="poster-grid" id="posterGrid" role="feed" aria-label="Media catalog">
+      <!-- Cards rendered dynamically -->
+    </div>
+  </main>
+
+  <!-- Native Accessible Modal Dialog (Compliant with Modern Web Guidance) -->
+  <dialog id="detailModal" aria-labelledby="modalTitle">
+    <div class="modal-backdrop-header" id="modalBackdrop">
+      <div class="modal-backdrop-gradient"></div>
+      <button class="modal-close-btn focusable" id="modalCloseBtn" aria-label="Close details" tabindex="0">✕</button>
+    </div>
+
+    <div class="modal-content-body">
+      <div class="modal-poster-col">
+        <img id="modalPoster" class="modal-poster" src="" alt="Poster" />
+      </div>
+
+      <div class="modal-info-col">
+        <h2 id="modalTitle" class="modal-title">Title Name</h2>
+        <div class="modal-meta-row" id="modalMeta">
+          <!-- Year, Type, IMDb -->
+        </div>
+
+        <div class="modal-genres" id="modalGenres">
+          <!-- Genre pills -->
+        </div>
+
+        <p class="modal-description" id="modalDescription">
+          Description goes here...
+        </p>
+
+        <!-- 1-Click Launch on Samsung TV -->
+        <div class="launch-section">
+          <div class="launch-heading">Where to Watch in Sweden</div>
+          <div class="launch-buttons-row" id="launchButtons">
+            <!-- Dynamic Launch Buttons (Netflix, Disney+, Max, Prime, SVT) -->
+          </div>
+          <div class="rent-buy-list hidden" id="rentBuyList">
+            <!-- Rent / Buy prices in SEK -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Application Entry Point -->
+  <script type="module" src="./src/app.js"></script>
+</body>
+</html>

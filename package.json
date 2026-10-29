@@ -1,0 +1,28 @@
+{
+  "name": "streamradar-se",
+  "appName": "StreamRadar SE",
+  "version": "1.0.0",
+  "description": "Cross-check streaming availability across Netflix, Disney+, Max, Prime Video, and SVT Play in Sweden",
+  "main": "index.html",
+  "packageType": "app",
+  "appPath": "index.html",
+  "keys": [
+    "MediaPlayPause",
+    "ColorF0Red",
+    "ColorF1Green",
+    "ColorF2Yellow",
+    "ColorF3Blue"
+  ],
+  "scripts": {
+    "start": "python3 -m http.server 8088 --directory ."
+  },
+  "keywords": [
+    "tizen",
+    "tizenbrew",
+    "streaming",
+    "justwatch",
+    "samsung-tv"
+  ],
+  "author": "Antigravity & Johan",
+  "license": "MIT"
+}

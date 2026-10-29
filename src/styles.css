@@ -598,3 +598,60 @@ dialog::backdrop {
   gap: 0.75rem;
   flex-wrap: wrap;
 }
+
+/* Visibility Utility */
+.hidden {
+  display: none !important;
+}
+
+/* Quick Search Suggestions */
+.quick-search-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 2.5rem 0 2.5rem;
+  flex-wrap: wrap;
+}
+
+.quick-search-label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  font-weight: 700;
+  margin-right: 0.25rem;
+}
+
+.quick-chip {
+  background: var(--bg-surface-elevated);
+  color: var(--text-muted);
+  border: 1px solid var(--border-subtle);
+  padding: 0.35rem 0.8rem;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.quick-chip:hover {
+  color: var(--text-main);
+  background: rgba(56, 189, 248, 0.15);
+  border-color: var(--accent);
+}
+
+/* Active card focus indicator on TV */
+.card:focus,
+.card:focus-visible {
+  outline: 4px solid var(--accent) !important;
+  box-shadow: 0 0 30px var(--accent-glow), 0 10px 25px rgba(0, 0, 0, 0.7) !important;
+  transform: translateY(-6px) scale(1.04);
+}
+
+/* Trailer hint on focused card */
+.card:focus .card-type-tag {
+  background: var(--accent);
+  color: #07090e;
+  font-weight: 800;
+}
+

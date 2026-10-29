@@ -33,6 +33,7 @@ const sectionTitle = document.getElementById('sectionTitle');
 const sectionCount = document.getElementById('sectionCount');
 const filterBar = document.getElementById('filterBar');
 const detailModal = document.getElementById('detailModal');
+const quickSearchRow = document.getElementById('quickSearchRow');
 
 // Initialize App
 export function initApp() {
@@ -96,6 +97,15 @@ export async function loadCurrentTab() {
   try {
     const pkgs = Array.from(state.selectedPackages);
 
+    // Toggle Quick Search row visibility
+    if (quickSearchRow) {
+      if (state.currentTab === 'search') {
+        quickSearchRow.classList.remove('hidden');
+      } else {
+        quickSearchRow.classList.add('hidden');
+      }
+    }
+
     if (state.currentTab === 'trending') {
       sectionTitle.textContent = 'Trending Across Your Services (Sweden)';
       state.titles = await getTrendingTitles(pkgs, 30);
@@ -148,11 +158,12 @@ function renderGrid(titles) {
     const card = document.createElement('div');
     card.className = 'card focusable';
     card.tabIndex = 0;
+    card.dataset.titleId = String(title.id);
     card.setAttribute('role', 'button');
     card.setAttribute('aria-label', `${title.title} (${title.year})`);
 
-    // Poster fallback
-    const posterSrc = title.posterUrl || 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22200%22%20height%3D%22300%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20fill%3D%22%231e293b%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20fill%3D%22%2394a3b8%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%3ENo%20Poster%3C%2Ftext%3E%3C%2Fsvg%3E';
+    // Poster fallback (prefer optimized s332 card poster for faster TV decoding)
+    const posterSrc = title.cardPosterUrl || title.posterUrl || 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22200%22%20height%3D%22300%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20fill%3D%22%231e293b%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20fill%3D%22%2394a3b8%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%3ENo%20Poster%3C%2Ftext%3E%3C%2Fsvg%3E';
 
     // Build badges for services carrying this title
     const badgeHtml = title.streamOffers.map(offer => {
@@ -177,7 +188,7 @@ function renderGrid(titles) {
 
     card.innerHTML = `
       <div class="card-poster-wrap">
-        <img class="card-poster" src="${posterSrc}" alt="${title.title}" loading="lazy" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22200%22%20height%3D%22300%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20fill%3D%22%231e293b%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20fill%3D%22%2394a3b8%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%3ENo%20Image%3C%2Ftext%3E%3C%2Fsvg%3E'" />
+        <img class="card-poster" src="${posterSrc}" alt="${title.title}" loading="${index < 8 ? 'eager' : 'lazy'}" onerror="this.src='data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22200%22%20height%3D%22300%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%22100%25%22%20height%3D%22100%25%22%20fill%3D%22%231e293b%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20fill%3D%22%2394a3b8%22%20dominant-baseline%3D%22middle%22%20text-anchor%3D%22middle%22%3ENo%20Image%3C%2Ftext%3E%3C%2Fsvg%3E'" />
         <span class="card-type-tag">${title.type === 'SHOW' ? 'Series' : 'Movie'}</span>
         ${title.imdbScore ? `<span class="card-imdb">⭐ ${title.imdbScore}</span>` : ''}
       </div>
@@ -196,6 +207,14 @@ function renderGrid(titles) {
     card.onclick = () => openDetailModal(title);
     gridContainer.appendChild(card);
   });
+
+  // Smooth TV Focus: Auto-focus the first card if nothing is focused
+  setTimeout(() => {
+    if (!detailModal.open && (document.activeElement === document.body || !document.activeElement)) {
+      const firstCard = gridContainer.querySelector('.card');
+      if (firstCard) firstCard.focus();
+    }
+  }, 100);
 }
 
 // Open Detail Modal (Modern Web Guidance compliant <dialog>)
@@ -324,6 +343,21 @@ function setupEventListeners() {
     }, 350);
   });
 
+  // Quick Search Chips
+  document.querySelectorAll('.quick-chip').forEach(chip => {
+    chip.onclick = () => {
+      const q = chip.dataset.query;
+      searchInput.value = q;
+      state.searchQuery = q;
+      if (state.currentTab !== 'search') {
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        document.querySelector('[data-tab="search"]').classList.add('active');
+        state.currentTab = 'search';
+      }
+      loadCurrentTab();
+    };
+  });
+
   // Global Keydown Handler for Remote Control & D-Pad
   window.addEventListener('keydown', handleKeyNavigation);
 }
@@ -345,6 +379,19 @@ function handleKeyNavigation(e) {
       state.searchQuery = '';
       loadCurrentTab();
       return;
+    }
+  }
+
+  // Play Button Shortcut on TV Remote (Plays trailer directly for focused card)
+  if (key === 'MediaPlayPause' || key === 'MediaPlay' || keyCode === 415 || keyCode === 10252) {
+    if (document.activeElement && document.activeElement.classList.contains('card')) {
+      const titleId = document.activeElement.dataset.titleId;
+      const titleObj = state.titles.find(t => String(t.id) === String(titleId));
+      if (titleObj) {
+        e.preventDefault();
+        playTrailer(titleObj.title, titleObj.year);
+        return;
+      }
     }
   }
 
@@ -443,7 +490,7 @@ function handleSpatialArrow(e, direction) {
   if (bestCandidate) {
     e.preventDefault();
     bestCandidate.focus();
-    bestCandidate.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    bestCandidate.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 }
 

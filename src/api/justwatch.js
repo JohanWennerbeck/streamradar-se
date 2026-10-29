@@ -71,8 +71,7 @@ async function fetchGraphQL(query, variables) {
   const response = await fetch(GRAPHQL_ENDPOINT, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
-      'User-Agent': 'Mozilla/5.0'
+      'Content-Type': 'application/json'
     },
     body: JSON.stringify({ query, variables })
   });
@@ -279,8 +278,9 @@ function formatTitleNode(node) {
     title: content.title || 'Untitled',
     year: content.originalReleaseYear || 'N/A',
     description: content.shortDescription || 'No description available.',
-    posterUrl: formatImageUrl(content.posterUrl, 's592'),
-    backdropUrl: backdrops.length > 0 ? formatImageUrl(backdrops[0].backdropUrl, 's1920') : '',
+    posterUrl: formatImageUrl(content.posterUrl, 's592', 'webp'),
+    cardPosterUrl: formatImageUrl(content.posterUrl, 's332', 'webp'),
+    backdropUrl: backdrops.length > 0 ? formatImageUrl(backdrops[0].backdropUrl, 's1920', 'webp') : '',
     imdbScore: scoring.imdbScore ? scoring.imdbScore.toFixed(1) : null,
     imdbVotes: scoring.imdbVotes,
     genres: (content.genres || []).map(g => g.translation),

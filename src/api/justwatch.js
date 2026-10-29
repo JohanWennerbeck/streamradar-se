@@ -11,7 +11,8 @@ export const PROVIDERS = [
     color: '#E50914',
     badgeBg: 'rgba(229, 9, 20, 0.2)',
     badgeBorder: '#E50914',
-    tizenAppId: '3201907018807',
+    candidateIds: ['org.tizen.netflix-app', '3201907018807'],
+    tizenAppId: 'org.tizen.netflix-app',
     webUrl: 'https://www.netflix.com'
   },
   {
@@ -21,6 +22,7 @@ export const PROVIDERS = [
     color: '#113CCF',
     badgeBg: 'rgba(17, 60, 207, 0.25)',
     badgeBorder: '#3b82f6',
+    candidateIds: ['MCmYXNxgcu.DisneyPlus', '3201901017640'],
     tizenAppId: 'MCmYXNxgcu.DisneyPlus',
     webUrl: 'https://www.disneyplus.com'
   },
@@ -31,7 +33,8 @@ export const PROVIDERS = [
     color: '#002BE7',
     badgeBg: 'rgba(0, 43, 231, 0.25)',
     badgeBorder: '#6366f1',
-    tizenAppId: 'k72191847c.Max',
+    candidateIds: ['5b8c3eb16b.BeamCTVDev', 'cj37Ni3qXM.HBONow', 'k72191847c.Max', '3202301029760'],
+    tizenAppId: '5b8c3eb16b.BeamCTVDev',
     webUrl: 'https://www.max.com'
   },
   {
@@ -41,6 +44,7 @@ export const PROVIDERS = [
     color: '#00A8E1',
     badgeBg: 'rgba(0, 168, 225, 0.2)',
     badgeBorder: '#00A8E1',
+    candidateIds: ['org.tizen.primevideo', '3201910019365', '3201910019355'],
     tizenAppId: 'org.tizen.primevideo',
     webUrl: 'https://www.primevideo.com'
   },
@@ -51,7 +55,8 @@ export const PROVIDERS = [
     color: '#00BA55',
     badgeBg: 'rgba(0, 186, 85, 0.25)',
     badgeBorder: '#10b981',
-    tizenAppId: '5071898972.SVTPlay',
+    candidateIds: ['5exPmCT0nz.svtplay', '5071898972.SVTPlay', '3201612011287', '3201611010983'],
+    tizenAppId: '5exPmCT0nz.svtplay',
     webUrl: 'https://www.svtplay.se'
   }
 ];

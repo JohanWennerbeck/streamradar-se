@@ -1,6 +1,14 @@
-# StreamRadar SE 🇸🇪
+# StreamRadar SE 🇸🇪 `v1.1.0`
 
 A 10-foot Smart TV application and **TizenBrew module** for Samsung TVs (and desktop browsers) that cross-checks real-time Swedish streaming availability across **Netflix**, **Disney+**, **Max**, **Amazon Prime Video**, and **SVT Play**.
+
+---
+
+## What's New in v1.1.0
+- **🎬 In-App Trailer Theater:** Plays YouTube trailers directly inside a full-screen TV modal using remote controls, plus an "Open in YouTube App" fallback.
+- **🚀 Verified Tizen App IDs:** Direct 1-click launch support for **Netflix** (`org.tizen.netflix-app`), **Disney+** (`MCmYXNxgcu.DisneyPlus`), **Max** (`5b8c3eb16b.BeamCTVDev`), **Prime Video** (`org.tizen.primevideo`), and **SVT Play** (`5exPmCT0nz.svtplay`).
+- **🔔 On-Screen TV Toast Feedback:** Displays status toasts when launching apps on the TV.
+- **🏷️ Version Badge:** Visible `v1.1.0` pill in the header.
 
 ---
 

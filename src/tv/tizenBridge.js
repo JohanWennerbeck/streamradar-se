@@ -5,6 +5,25 @@
 
 export const isTizen = typeof window !== 'undefined' && typeof window.tizen !== 'undefined';
 
+export function showToast(message, durationMs = 3500) {
+  let toast = document.getElementById('tvToast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'tvToast';
+    toast.className = 'tv-toast hidden';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = message;
+  toast.classList.remove('hidden');
+  toast.classList.add('visible');
+
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => {
+    toast.classList.remove('visible');
+    toast.classList.add('hidden');
+  }, durationMs);
+}
+
 export function initTizenRemoteKeys() {
   if (!isTizen) {
     console.log('[TizenBridge] Running in standard browser environment (Desktop/Mac mode)');
@@ -37,59 +56,115 @@ export function initTizenRemoteKeys() {
 
 /**
  * Launch an installed streaming application on the Samsung QN95
- * Falls back to web URL when testing on a PC/Mac
+ * Tests each known candidate ID on Samsung Tizen OS
  */
 export function launchStreamingApp(provider, fallbackUrl) {
-  if (isTizen && provider && provider.tizenAppId) {
-    try {
-      console.log(`[TizenBridge] Launching Tizen app: ${provider.name} (${provider.tizenAppId})`);
-      window.tizen.application.launch(
-        provider.tizenAppId,
-        () => {
-          console.log(`[TizenBridge] App ${provider.name} launched successfully.`);
-        },
-        (err) => {
-          console.warn(`[TizenBridge] Could not direct-launch ${provider.tizenAppId}, attempting fallback:`, err);
-          if (fallbackUrl || provider.webUrl) {
-            window.open(fallbackUrl || provider.webUrl, '_blank');
-          }
+  if (!provider) return;
+
+  const candidateIds = provider.candidateIds || (provider.tizenAppId ? [provider.tizenAppId] : []);
+
+  if (isTizen && window.tizen && window.tizen.application && candidateIds.length > 0) {
+    showToast(`Launching ${provider.name} on TV...`);
+
+    let index = 0;
+    function tryNext() {
+      if (index >= candidateIds.length) {
+        showToast(`Could not launch ${provider.name}. Please ensure the app is installed from the Samsung App Store.`);
+        if (fallbackUrl || provider.webUrl) {
+          window.open(fallbackUrl || provider.webUrl, '_blank');
         }
-      );
-      return;
-    } catch (e) {
-      console.error(`[TizenBridge] Error in tizen.application.launch:`, e);
+        return;
+      }
+
+      const appId = candidateIds[index++];
+      console.log(`[TizenBridge] Trying to launch ${provider.name} with ID: ${appId}`);
+
+      try {
+        window.tizen.application.launch(
+          appId,
+          () => {
+            console.log(`[TizenBridge] Successfully launched ${provider.name} (${appId})`);
+            showToast(`Launched ${provider.name}!`);
+          },
+          (err) => {
+            console.warn(`[TizenBridge] Failed to launch ${appId} via launch(), trying AppControl...`, err);
+            try {
+              const appControl = new window.tizen.ApplicationControl(
+                "http://tizen.org/appcontrol/operation/default",
+                null, null, null, null
+              );
+              window.tizen.application.launchAppControl(
+                appControl,
+                appId,
+                () => {
+                  console.log(`[TizenBridge] Successfully launched via launchAppControl: ${appId}`);
+                  showToast(`Launched ${provider.name}!`);
+                },
+                () => {
+                  tryNext();
+                }
+              );
+            } catch (e2) {
+              tryNext();
+            }
+          }
+        );
+      } catch (e) {
+        tryNext();
+      }
     }
+
+    tryNext();
+    return;
   }
 
   // Desktop or fallback browser behavior
-  const targetUrl = fallbackUrl || (provider && provider.webUrl) || 'https://www.google.com';
+  const targetUrl = fallbackUrl || provider.webUrl || 'https://www.google.com';
   console.log(`[TizenBridge] Opening web URL: ${targetUrl}`);
   window.open(targetUrl, '_blank');
 }
 
 /**
- * Launch YouTube or TizenTube to search and play a movie trailer
+ * Launch native YouTube app on Samsung TV
  */
-export function playTrailer(title, year) {
+export function launchYouTubeApp(title, year) {
   const query = encodeURIComponent(`${title} ${year || ''} trailer`);
-  const youtubeUrl = `https://www.youtube.com/results?search_query=${query}`;
+  const ytCandidates = ['9Ur5IzDKqV.TizenYouTube', 'com.samsung.tv.cobalt-yt', '111299001912'];
 
-  if (isTizen) {
-    // Try launching TizenBrew / TizenTube if installed
-    const tizenBrewAppId = 'xvvl3S1bvH.TizenBrewStandalone';
-    try {
-      window.tizen.application.launch(
-        tizenBrewAppId,
-        () => console.log('[TizenBridge] Launched TizenBrew for trailer'),
-        () => window.open(youtubeUrl, '_blank')
-      );
-      return;
-    } catch (e) {
-      // ignore
+  if (isTizen && window.tizen && window.tizen.application) {
+    showToast('Launching YouTube app on TV...');
+    let index = 0;
+    function tryYt() {
+      if (index >= ytCandidates.length) {
+        showToast('YouTube app not found on this TV.');
+        return;
+      }
+      const ytId = ytCandidates[index++];
+      try {
+        window.tizen.application.launch(
+          ytId,
+          () => showToast('YouTube launched!'),
+          () => tryYt()
+        );
+      } catch (e) {
+        tryYt();
+      }
     }
+    tryYt();
+    return;
   }
 
-  window.open(youtubeUrl, '_blank');
+  window.open(`https://www.youtube.com/results?search_query=${query}`, '_blank');
+}
+
+/**
+ * Play trailer in built-in Trailer Theater modal
+ */
+export function playTrailer(title, year) {
+  const event = new CustomEvent('open-trailer-theater', {
+    detail: { title, year }
+  });
+  window.dispatchEvent(event);
 }
 
 /**

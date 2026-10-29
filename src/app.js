@@ -9,6 +9,7 @@ import {
 import {
   initTizenRemoteKeys,
   launchStreamingApp,
+  launchYouTubeApp,
   playTrailer,
   exitTizenApp,
   isTizen
@@ -309,10 +310,57 @@ function closeDetailModal() {
   }
 }
 
+// Open In-App Trailer Theater
+function openTrailerTheater(title, year) {
+  const trailerModal = document.getElementById('trailerModal');
+  const trailerModalTitle = document.getElementById('trailerModalTitle');
+  const trailerIframe = document.getElementById('trailerIframe');
+  const btnOpenYtApp = document.getElementById('btnOpenYtApp');
+
+  if (trailerModalTitle) {
+    trailerModalTitle.textContent = `${title} (${year || ''}) - Trailer`;
+  }
+  if (trailerIframe) {
+    const query = encodeURIComponent(`${title} ${year || ''} official trailer`);
+    trailerIframe.src = `https://www.youtube-nocookie.com/embed?listType=search&list=${query}&autoplay=1`;
+  }
+
+  if (btnOpenYtApp) {
+    btnOpenYtApp.onclick = () => {
+      launchYouTubeApp(title, year);
+    };
+  }
+
+  if (trailerModal) {
+    trailerModal.showModal();
+    setTimeout(() => {
+      if (btnOpenYtApp) btnOpenYtApp.focus();
+    }, 100);
+  }
+}
+
+function closeTrailerTheater() {
+  const trailerModal = document.getElementById('trailerModal');
+  const trailerIframe = document.getElementById('trailerIframe');
+  if (trailerModal && trailerModal.open) {
+    if (trailerIframe) trailerIframe.src = '';
+    trailerModal.close();
+  }
+}
+
 // Keyboard & Remote D-Pad Navigation
 function setupEventListeners() {
   // Modal Close Button
   document.getElementById('modalCloseBtn').onclick = closeDetailModal;
+
+  // Trailer Modal Close Button & Custom Event
+  const trailerCloseBtn = document.getElementById('trailerCloseBtn');
+  if (trailerCloseBtn) trailerCloseBtn.onclick = closeTrailerTheater;
+
+  window.addEventListener('open-trailer-theater', (e) => {
+    const { title, year } = e.detail;
+    openTrailerTheater(title, year);
+  });
 
   // Nav Tabs
   document.querySelectorAll('.nav-tab').forEach(tab => {
@@ -367,7 +415,13 @@ function handleKeyNavigation(e) {
   const keyCode = e.keyCode;
 
   // Samsung Return / Back Button (keyCode 10009) or Escape
+  const trailerModal = document.getElementById('trailerModal');
   if (key === 'Escape' || keyCode === 10009 || key === 'BrowserBack' || key === 'Back') {
+    if (trailerModal && trailerModal.open) {
+      e.preventDefault();
+      closeTrailerTheater();
+      return;
+    }
     if (detailModal.open) {
       e.preventDefault();
       closeDetailModal();

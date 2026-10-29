@@ -1,7 +1,7 @@
 {
   "name": "streamradar-se",
   "appName": "StreamRadar SE",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Cross-check streaming availability across Netflix, Disney+, Max, Prime Video, and SVT Play in Sweden",
   "main": "index.html",
   "packageType": "app",
